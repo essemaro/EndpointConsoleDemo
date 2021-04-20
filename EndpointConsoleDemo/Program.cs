@@ -324,8 +324,10 @@ namespace EndpointConsoleDemo
 
                     if (result == "y")
                     {
-                        await client.DeleteAsync($"https://my-json-server.typicode.com/essemaro/EndpointConsoleDemo/users/{userid}");
+                        var response = await client.DeleteAsync($"https://my-json-server.typicode.com/essemaro/EndpointConsoleDemo/users/{userid}");
                         approved = true;
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusCode);
                         Console.WriteLine("User deleted.");
                     }
                     else if (result == "n")
