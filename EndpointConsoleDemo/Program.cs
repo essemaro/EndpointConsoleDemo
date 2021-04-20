@@ -70,6 +70,14 @@ namespace EndpointConsoleDemo
             return users;
         }
 
+        private static async Task<User> GetUser(int userid)
+        {
+            var streamTask = client.GetStreamAsync($"https://my-json-server.typicode.com/essemaro/EndpointConsoleDemo/users/{userid}");
+            var user = await JsonSerializer.DeserializeAsync<User>(await streamTask);
+
+            return user;
+        }
+
         private static void GetUserInput()
         {
             Console.WriteLine("Do you want to ADD, UPDATE, or DELETE a user? Type EXIT or CTRL+C to quit application. ");
@@ -85,13 +93,13 @@ namespace EndpointConsoleDemo
             }
             else if (result == "UPDATE")
             {
-                //Add UPDATE FUNCTION
+                UpdateUser().Wait();
                 ViewUsers().Wait();
                 GetUserInput();
             }
             else if (result == "DELETE")
             {
-                //Add DELETE FUNCTION
+                DeleteUser().Wait();
                 ViewUsers().Wait();
                 GetUserInput();
             }
@@ -123,7 +131,7 @@ namespace EndpointConsoleDemo
                 Console.WriteLine("Enter user's name: ");
                 string result = Console.ReadLine();
                 //Check for empty value
-                if (!UserInputValidation(result))
+                if (!string.IsNullOrEmpty(result))
                 {
                     throw new InvalidOperationException("User's name cannot be empty.");
                 }
@@ -133,7 +141,7 @@ namespace EndpointConsoleDemo
                 //Username
                 Console.WriteLine("Enter user's username: ");
                 result = Console.ReadLine();
-                if (!UserInputValidation(result))
+                if (!string.IsNullOrEmpty(result))
                 {
                     throw new InvalidOperationException("User's username cannot be empty.");
                 }
@@ -143,7 +151,7 @@ namespace EndpointConsoleDemo
                 //Email
                 Console.WriteLine("Enter user's email: ");
                 result = Console.ReadLine();
-                if (!UserInputValidation(result))
+                if (!string.IsNullOrEmpty(result))
                 {
                     throw new InvalidOperationException("User's email cannot be empty.");
                 }
@@ -173,26 +181,166 @@ namespace EndpointConsoleDemo
                 var byteContent = new ByteArrayContent(buffer);
                 byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-                await client.PostAsync("https://my-json-server.typicode.com/essemaro/EndpointConsoleDemo", byteContent);
+                await client.PostAsync("https://my-json-server.typicode.com/essemaro/EndpointConsoleDemo/users", byteContent);
             }
             catch (Exception ex)
             {
 
-                Console.WriteLine("There was an issue adding a user");
+                Console.WriteLine("There was an issue adding the user.");
                 Console.WriteLine($"Error: {ex.Message}");
+                Console.WriteLine("Press enter to continue...");
+                Console.ReadLine();
             }
         }
 
-        //Input Validation
-        private static bool UserInputValidation(string result)
+        //Update user information
+        private static async Task UpdateUser()
         {
-            if (String.IsNullOrEmpty(result))
+            try
             {
-                return false;
+                User updateUser = new User();
+
+                //Get user id for updating
+                Console.WriteLine("Enter id for user that needs updating: ");
+                if (!Int32.TryParse(Console.ReadLine(), out int userid))
+                {
+                    throw new InvalidOperationException("User id must be a number.");
+                }
+
+                //Get user info
+                updateUser = await GetUser(userid);
+
+
+                //Get updated user information
+                //Name
+                Console.WriteLine("Press enter to not enter any new data.");
+                Console.WriteLine($"Current name: {updateUser.Name}");
+                Console.WriteLine("Enter user's name: ");
+                string result = Console.ReadLine();
+                //Check for empty value
+                if (!string.IsNullOrEmpty(result))
+                {
+                    updateUser.Name = result;
+                }                
+                result = ""; //Clearing result to mitigate info redundancy if nothing is entered
+
+                //Username
+                Console.WriteLine("Enter user's username: ");
+                result = Console.ReadLine();
+                if (!string.IsNullOrEmpty(result))
+                {
+                    updateUser.Username = result;
+                }
+                
+                result = "";
+
+                //Email
+                Console.WriteLine("Enter user's email: ");
+                result = Console.ReadLine();
+                if (!string.IsNullOrEmpty(result))
+                {
+                    updateUser.Email = result;
+                }
+                
+                result = "";
+
+                //Phone number
+                Console.WriteLine("Enter user's phone number: ");
+                result = Console.ReadLine();
+                if (!string.IsNullOrEmpty(result))
+                {
+                    updateUser.Phone = result;
+                }
+                
+                result = "";
+
+                //Website 
+                Console.WriteLine("Enter user's website: ");
+                result = Console.ReadLine();
+                if (!string.IsNullOrEmpty(result))
+                {
+                    updateUser.Website = result;
+                }
+                
+                result = "";
+
+                //Company Name
+                Console.WriteLine("Enter user's company name: ");
+                result = Console.ReadLine();
+                if (!string.IsNullOrEmpty(result))
+                {
+                    updateUser.CompanyName = result; 
+                }
+
+                //Serialize object to json and convert to HttpContent type
+                var content = JsonSerializer.Serialize(updateUser);
+                var buffer = System.Text.Encoding.UTF8.GetBytes(content);
+                var byteContent = new ByteArrayContent(buffer);
+                byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                
+                await client.PutAsync($"https://my-json-server.typicode.com/essemaro/EndpointConsoleDemo/users/{userid}", byteContent);
             }
-            else
+            catch (Exception ex)
             {
-                return true;
+                Console.WriteLine();
+                Console.WriteLine("There was an issue updating the user.");
+                Console.WriteLine($"Error: {ex.Message}");
+                Console.WriteLine("Press enter to continue...");
+                Console.ReadLine();
+            }
+        }
+
+        //Delete User
+        private static async Task DeleteUser()
+        {
+            try
+            {
+                User delUser = new User();
+
+                //Get user id for deletion
+                Console.WriteLine("Enter id for user to be deleted: ");
+                if (!Int32.TryParse(Console.ReadLine(), out int userid))
+                {
+                    throw new InvalidOperationException("User id must be a number.");
+                }
+
+                delUser = await GetUser(userid);
+                bool approved = false;
+
+                while (!approved)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine($"Are you sure you want to delete {delUser.Name}? (y/N)");
+                    string result = Console.ReadLine();
+                    result = result.ToLower();
+
+                    if (result == "y")
+                    {
+                        await client.DeleteAsync($"https://my-json-server.typicode.com/essemaro/EndpointConsoleDemo/users/{userid}");
+                        approved = true;
+                        Console.WriteLine("User deleted.");
+                    }
+                    else if (result == "n")
+                    {
+                        Console.WriteLine("Deletion cancelled.");
+                        approved = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Please enter y or N when confirming deletion.");
+                    }
+                    Console.WriteLine("Press enter to continue...");
+                    Console.ReadLine();
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine();
+                Console.WriteLine("There was an issue deleting the user");
+                Console.WriteLine($"Error: {ex.Message}");
+                Console.WriteLine("Press enter to continue...");
+                Console.ReadLine();
             }
         }
 
@@ -200,6 +348,7 @@ namespace EndpointConsoleDemo
         private static async Task ViewUsers()
         {
             //Retrieves and displays a list of users
+            Console.WriteLine();
             Console.WriteLine("Current Users: ");
             Console.WriteLine();
             var users = await GetUsers();
