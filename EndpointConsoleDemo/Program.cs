@@ -109,7 +109,7 @@ namespace EndpointConsoleDemo
             }
             else
             {
-                Console.WriteLine("Invalid response entered. Press a button to continue...");
+                Console.WriteLine("Invalid response entered.");
                 Console.WriteLine();
                 GetUserInput();
             }
@@ -131,7 +131,7 @@ namespace EndpointConsoleDemo
                 Console.WriteLine("Enter user's name: ");
                 string result = Console.ReadLine();
                 //Check for empty value
-                if (!string.IsNullOrEmpty(result))
+                if (String.IsNullOrEmpty(result))
                 {
                     throw new InvalidOperationException("User's name cannot be empty.");
                 }
@@ -141,7 +141,7 @@ namespace EndpointConsoleDemo
                 //Username
                 Console.WriteLine("Enter user's username: ");
                 result = Console.ReadLine();
-                if (!string.IsNullOrEmpty(result))
+                if (String.IsNullOrEmpty(result))
                 {
                     throw new InvalidOperationException("User's username cannot be empty.");
                 }
@@ -151,7 +151,7 @@ namespace EndpointConsoleDemo
                 //Email
                 Console.WriteLine("Enter user's email: ");
                 result = Console.ReadLine();
-                if (!string.IsNullOrEmpty(result))
+                if (String.IsNullOrEmpty(result))
                 {
                     throw new InvalidOperationException("User's email cannot be empty.");
                 }
@@ -181,7 +181,11 @@ namespace EndpointConsoleDemo
                 var byteContent = new ByteArrayContent(buffer);
                 byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-                await client.PostAsync("https://my-json-server.typicode.com/essemaro/EndpointConsoleDemo/users", byteContent);
+                var response = await client.PostAsync("https://my-json-server.typicode.com/essemaro/EndpointConsoleDemo/users", byteContent);
+                Console.WriteLine();
+                Console.WriteLine(response.StatusCode);
+                Console.WriteLine("User added. Press enter to continue...");
+                Console.ReadLine();
             }
             catch (Exception ex)
             {
@@ -218,7 +222,7 @@ namespace EndpointConsoleDemo
                 Console.WriteLine("Enter user's name: ");
                 string result = Console.ReadLine();
                 //Check for empty value
-                if (!string.IsNullOrEmpty(result))
+                if (!String.IsNullOrEmpty(result))
                 {
                     updateUser.Name = result;
                 }                
@@ -227,7 +231,7 @@ namespace EndpointConsoleDemo
                 //Username
                 Console.WriteLine("Enter user's username: ");
                 result = Console.ReadLine();
-                if (!string.IsNullOrEmpty(result))
+                if (!String.IsNullOrEmpty(result))
                 {
                     updateUser.Username = result;
                 }
@@ -237,7 +241,7 @@ namespace EndpointConsoleDemo
                 //Email
                 Console.WriteLine("Enter user's email: ");
                 result = Console.ReadLine();
-                if (!string.IsNullOrEmpty(result))
+                if (!String.IsNullOrEmpty(result))
                 {
                     updateUser.Email = result;
                 }
@@ -247,7 +251,7 @@ namespace EndpointConsoleDemo
                 //Phone number
                 Console.WriteLine("Enter user's phone number: ");
                 result = Console.ReadLine();
-                if (!string.IsNullOrEmpty(result))
+                if (!String.IsNullOrEmpty(result))
                 {
                     updateUser.Phone = result;
                 }
@@ -257,7 +261,7 @@ namespace EndpointConsoleDemo
                 //Website 
                 Console.WriteLine("Enter user's website: ");
                 result = Console.ReadLine();
-                if (!string.IsNullOrEmpty(result))
+                if (!String.IsNullOrEmpty(result))
                 {
                     updateUser.Website = result;
                 }
@@ -267,7 +271,7 @@ namespace EndpointConsoleDemo
                 //Company Name
                 Console.WriteLine("Enter user's company name: ");
                 result = Console.ReadLine();
-                if (!string.IsNullOrEmpty(result))
+                if (!String.IsNullOrEmpty(result))
                 {
                     updateUser.CompanyName = result; 
                 }
@@ -278,7 +282,11 @@ namespace EndpointConsoleDemo
                 var byteContent = new ByteArrayContent(buffer);
                 byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                 
-                await client.PutAsync($"https://my-json-server.typicode.com/essemaro/EndpointConsoleDemo/users/{userid}", byteContent);
+                var response = await client.PutAsync($"https://my-json-server.typicode.com/essemaro/EndpointConsoleDemo/users/{userid}", byteContent);
+                Console.WriteLine();
+                Console.WriteLine(response.StatusCode);
+                Console.WriteLine($"User {updateUser.Name} updated. Press enter to continue...");
+                Console.ReadLine();
             }
             catch (Exception ex)
             {
