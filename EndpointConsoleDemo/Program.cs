@@ -62,6 +62,7 @@ namespace EndpointConsoleDemo
             
         }      
 
+        //Get all users
         private static async Task<List<User>> GetUsers()
         {
             var streamTask = client.GetStreamAsync("https://my-json-server.typicode.com/essemaro/EndpointConsoleDemo/users");
@@ -70,6 +71,7 @@ namespace EndpointConsoleDemo
             return users;
         }
 
+        //Get specified user
         private static async Task<User> GetUser(int userid)
         {
             var streamTask = client.GetStreamAsync($"https://my-json-server.typicode.com/essemaro/EndpointConsoleDemo/users/{userid}");
@@ -78,6 +80,7 @@ namespace EndpointConsoleDemo
             return user;
         }
 
+        //Get input from app user
         private static void GetUserInput()
         {
             Console.WriteLine("Do you want to ADD, UPDATE, or DELETE a user? Type EXIT or CTRL+C to quit application. ");
@@ -181,6 +184,7 @@ namespace EndpointConsoleDemo
                 var byteContent = new ByteArrayContent(buffer);
                 byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
+                //Post method to add user
                 var response = await client.PostAsync("https://my-json-server.typicode.com/essemaro/EndpointConsoleDemo/users", byteContent);
                 Console.WriteLine();
                 Console.WriteLine(response.StatusCode);
@@ -282,6 +286,7 @@ namespace EndpointConsoleDemo
                 var byteContent = new ByteArrayContent(buffer);
                 byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                 
+                //Put method to update user
                 var response = await client.PutAsync($"https://my-json-server.typicode.com/essemaro/EndpointConsoleDemo/users/{userid}", byteContent);
                 Console.WriteLine();
                 Console.WriteLine(response.StatusCode);
@@ -315,6 +320,7 @@ namespace EndpointConsoleDemo
                 delUser = await GetUser(userid);
                 bool approved = false;
 
+                //Check app user input
                 while (!approved)
                 {
                     Console.WriteLine();
@@ -324,6 +330,7 @@ namespace EndpointConsoleDemo
 
                     if (result == "y")
                     {
+                        //DELETE method to remove user
                         var response = await client.DeleteAsync($"https://my-json-server.typicode.com/essemaro/EndpointConsoleDemo/users/{userid}");
                         approved = true;
                         Console.WriteLine();
